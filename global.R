@@ -1,4 +1,4 @@
-requiredPackages = c("reticulate","shinydashboard","shinydashboardPlus")
+requiredPackages = c("reticulate","shiny", "shinydashboard","shinydashboardPlus","shinyWidgets","shinyjs","shinycssloaders")
 installedPackages = rownames(installed.packages())
 missingPackages = requiredPackages[!requiredPackages%in%installedPackages]
 
@@ -18,3 +18,4 @@ source_app_functions = function(){
 }
 
 source_app_functions()
+
