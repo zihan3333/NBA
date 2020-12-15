@@ -1,4 +1,6 @@
-requiredPackages = c("reticulate","shiny", "shinydashboard","shinydashboardPlus","shinyWidgets","shinyjs","shinycssloaders")
+requiredPackages = c("reticulate","shiny", "shinydashboard","shinydashboardPlus","shinyWidgets","shinyjs","shinycssloaders",
+                     "styler","shinyAce","shinyjqui","data.table")
+
 installedPackages = rownames(installed.packages())
 missingPackages = requiredPackages[!requiredPackages%in%installedPackages]
 
@@ -19,3 +21,5 @@ source_app_functions = function(){
 
 source_app_functions()
 
+teams_list = fread("team_list.csv")
+player_list = fread("player_list.csv")
