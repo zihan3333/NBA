@@ -1,6 +1,6 @@
 Page_TeamVsTeam_UI = function(id){
   ns = NS(id)
-  
+
   list(
   actionButton(ns("run"),"RUN"),
   fluidRow(
@@ -32,9 +32,17 @@ Page_TeamVsTeam_UI = function(id){
       status = "warning", 
       solidHeader = FALSE, 
       collapsible = TRUE,
+      
+      actionButton(ns('open_h2h_modal'),"By Game Details"),
       DT::dataTableOutput(ns('h2h_records'))
 
-    )
+    ),
+    
+    bsModal(id = ns("gameBoxScoreModal"), title = "Game Details", trigger = ns("open_h2h_modal"), 
+            #"SAdasd"
+            module_gameBoxScore_UI(ns("h2h"))
+            
+            , size = "large")
     )
     
   )
@@ -56,6 +64,8 @@ Page_TeamVsTeam_server = function(input,output, session){
   #   selectInput(ns("player_choice"), label = "", choices = teams_list$full_name)
   #   
   # })
+  
+  Gameid  = reactiveValues()
   
   output$teamBanner1 = renderUI({
 
@@ -84,13 +94,32 @@ Page_TeamVsTeam_server = function(input,output, session){
     
   })
   
-  output$h2h_records = renderDT({
+
+  
+  observe({
     
-    H2H_table = Find_team_H2H(input$team_choice1, input$team_choice2)
-    DT::datatable(H2H_table,options = list(scrollX=T))
+    req(input$team_choice1)
+    req(input$team_choice2)
+    
+    Gameid$H2H_table = Find_team_H2H(input$team_choice1, input$team_choice2)
+    
+    output$h2h_records = renderDT({
+      
+      DT::datatable(Gameid$H2H_table,options = list(scrollX=T), selection = 'single')
+      
+    })
     
   })
   
+  observe({
+    req(Gameid$H2H_table)
+    Gameid$h2h_id = Gameid$H2H_table$GAME_ID[input$h2h_records_rows_selected] 
+    print(Gameid$h2h_id)
+    #module_gameBoxScore_server("h2h", game_id = reactive(Gameid$h2h_id))
+  })
+  
+  callModule(module = module_gameBoxScore_server, id = "h2h", gameid = reactive(Gameid$h2h_id))
+
   
   
 }

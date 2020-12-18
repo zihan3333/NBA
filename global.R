@@ -1,5 +1,5 @@
 requiredPackages = c("reticulate","shiny", "shinydashboard","shinydashboardPlus","shinyWidgets","shinyjs","shinycssloaders",
-                     "styler","shinyAce","shinyjqui","data.table","dplyr","DT")
+                     "styler","shinyAce","shinyjqui","data.table","dplyr","DT","shinyBS")
 
 installedPackages = rownames(installed.packages())
 missingPackages = requiredPackages[!requiredPackages%in%installedPackages]

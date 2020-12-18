@@ -28,7 +28,8 @@ ui = function(request){
                           ".shiny-output-error {visibility:hidden; }",
                           ".shiny-output-error:before {visibility:hidden; }"
                           ),
-        
+        tags$head(tags$style(".modal-dialog{ width:700px}")),
+        tags$head(tags$style(".modal-body{ min-height:700px}")),
         withSpinner(
             uiOutput('bodyUI')
         )
