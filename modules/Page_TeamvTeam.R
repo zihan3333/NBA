@@ -116,9 +116,10 @@ Page_TeamVsTeam_server = function(input,output, session){
     Gameid$h2h_id = Gameid$H2H_table$GAME_ID[input$h2h_records_rows_selected] 
     print(Gameid$h2h_id)
     #module_gameBoxScore_server("h2h", game_id = reactive(Gameid$h2h_id))
+    callModule(module = module_gameBoxScore_server, id = "h2h", gameid = Gameid$h2h_id)
   })
   
-  callModule(module = module_gameBoxScore_server, id = "h2h", gameid = reactive(Gameid$h2h_id))
+  
 
   
   
