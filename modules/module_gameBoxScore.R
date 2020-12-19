@@ -35,7 +35,7 @@ module_gameBoxScore_server = function(input, output, session, gameid){
   
   output$boxScoreTraditional = renderDT({
     
-    trad_table = nba$boxscoretraditionalv2$BoxScoreTraditionalV2(game_id = gameid)$get_data_frames()[[1]] %>% py_to_r() 
+    trad_table = nba$boxscoretraditionalv2$BoxScoreTraditionalV2(game_id = gameid)$get_data_frames()[[1]]
     
     return(DT::datatable(trad_table,options = list(scrollX=T)))
     
