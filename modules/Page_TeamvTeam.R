@@ -2,7 +2,6 @@ Page_TeamVsTeam_UI = function(id){
   ns = NS(id)
 
   list(
-  actionButton(ns("run"),"RUN"),
   fluidRow(
       column(width = 6,
           uiOutput(ns("teamBanner1")),

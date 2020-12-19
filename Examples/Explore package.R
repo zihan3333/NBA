@@ -4,6 +4,13 @@ game_id  = h2h$GAME_ID[1]
 team_id = team_id_finder("ATL")
 opp_team_id = team_id_finder("LAL")
 
+playerid = player_id_finder("lebron james")
+
+
+nba$playerdashboardbyopponent$PlayerDashboardByOpponent()
+
+teamdashboardbyopponent.TeamDashboardByOpponent(team_id = teams.find_team_by_abbreviation('gsw')['id'],season = "2017-18",period =1, per_mode_detailed = "PerGame").get_data_frames()
+
 #useful
 boxscore = nba$boxscoreadvancedv2$BoxScoreAdvancedV2(game_id = game_id)$get_data_frames()
 boxscore[[1]] %>% py_to_r() 
@@ -21,14 +28,13 @@ matchups = nba$boxscorematchups$BoxScoreMatchups(game_id = game_id)$get_data_fra
 boxscorescoringv2
 
 #useful
-nba$boxscoretraditionalv2$BoxScoreTraditionalV2(game_id = game_id)$get_data_frames()[[1]] %>% py_to_r() 
+nba$boxscoretraditionalv2$BoxScoreTraditionalV2(game_id = game_id)$get_data_frames()[[2]] %>% py_to_r() 
 
 nba$boxscoreusagev2$BoxScoreUsageV2(game_id = game_id)$get_data_frames()[[1]] %>% py_to_r()
 
 nba$hustlestatsboxscore$HustleStatsBoxScore(game_id = game_id)$get_data_frames()[[2]] %>% py_to_r()
 
 
-playerid = player_id_finder("lebron james")
 
 nba$commonplayerinfo$CommonPlayerInfo(player_id = playerid)$get_data_frames()[[1]]%>% py_to_r() #POSITION
 

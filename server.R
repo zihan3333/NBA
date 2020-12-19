@@ -11,7 +11,7 @@ server = function(input,output,session){
         ),
         list(
             tabName = 'PlayerVsTeam', parentTab = NULL, text = "PlayerVsTeam",icon = "database",
-            namespace = "pvt",server_module = "page_model_mgt_server",ui_module = "page_model_mgt_UI"
+            namespace = "pvt",server_module = "Page_PlayerVsTeam_server",ui_module = "Page_PlayerVsTeam_UI"
         )
         
     )
