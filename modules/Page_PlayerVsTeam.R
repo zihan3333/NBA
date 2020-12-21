@@ -44,11 +44,13 @@ Page_PlayerVsTeam_UI = function(id){
                       title = "Game Details", width = 12,
                       # The id lets us use input$tabset1 on the server to find the current tab
                       id = ns("tabset1"), height = NULL,
-                      tabPanel("Defense vs Team",
+                      tabPanel("GameSplit vs Team",
                                
                                DT::dataTableOutput(ns('DashboardOpponent'))
                       ),
-                      tabPanel("Tab2","" )
+                      tabPanel("Match ups",
+                               
+                               "" )
                     ),
                     br(),
                     br()
