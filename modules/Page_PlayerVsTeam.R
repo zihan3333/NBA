@@ -1,6 +1,8 @@
 Page_PlayerVsTeam_UI = function(id){
   ns = NS(id)
   
+  team_choice = teams_list$abbreviation
+  names(team_choice) = teams_list$full_name
   fluidRow(column(3,
                   boxPlus(
                     title = "Select Your Player", 
@@ -11,7 +13,7 @@ Page_PlayerVsTeam_UI = function(id){
                     
                     tags$h2("VS",  align = "center"),
                     
-                    selectInput(ns("team_choice"), label = "Team", choices = teams_list$full_name),
+                    selectInput(ns("team_choice"), label = "Team", choices = team_choice),
                     awesomeCheckbox(
                       inputId = ns("next_matchup"),
                       label = "Use Next Matchup", 
@@ -46,27 +48,48 @@ Page_PlayerVsTeam_UI = function(id){
                       id = ns("tabset1"), height = NULL,
                       tabPanel("GameSplit vs Team",
                                
-                               DT::dataTableOutput(ns('DashboardOpponent'))
+                               DT::dataTableOutput(ns('DashboardOpponent')),
+                               
+                               br(),
+                               h2("Specific Performance"),
+                               actionButton(ns('open_GameSpecfic_modal'),"Check Details"),
+                               DT::dataTableOutput(ns('gamelogsSpecfic'))
+                               
+                               
                       ),
-                      tabPanel("Match ups",
+                      tabPanel("Recent performance",
+                               actionButton(ns('open_GameRecent_modal'),"Check Details"),
+                               DT::dataTableOutput(ns('gamelogRecent')),
                                
                                "" )
+                      
                     ),
+                    
+                    bsModal(id = ns("gameRecentModal"), title = "Game Details", trigger = ns("open_GameRecent_modal"), 
+                            module_gameBoxScore_UI(ns("gamelogsRecent"))
+                            
+                            , size = "large")
+                    ),
+                    bsModal(id = ns("gameSpecficModal"), title = "Game Details", trigger = ns("open_GameSpecfic_modal"), 
+                          module_gameBoxScore_UI(ns("gamelogsSpecfic"))
+                          
+                          , size = "large")
+                   ),
                     br(),
                     br()
                     
                   )
                   
-                  )
            
            
-           )
   
 }
 
 Page_PlayerVsTeam_server = function(input,output, session){
   
   ns = session$ns
+  
+  output_data = reactiveValues()
   
   output$PlayerBanner = renderUI({
     tryCatch({
@@ -103,11 +126,18 @@ Page_PlayerVsTeam_server = function(input,output, session){
     playerid = player_id_finder(input$player_choice)
     season = input$season_brief
     mode = input$mode_brief
-    dashboard_by_opp = nba$playerdashboardbyopponent$PlayerDashboardByOpponent(player_id = playerid,season = season, per_mode_detailed = mode)$get_data_frames()
-    opp_name = unlist(strsplit(input$team_choice," ")) %>% tail(1)
+    output_data$dashboard_by_opp = nba$playerdashboardbyopponent$PlayerDashboardByOpponent(player_id = playerid,season = season, per_mode_detailed = mode)$get_data_frames()
+    
+    output_data$gamelogs = nba$playergamelog$PlayerGameLog(player_id = playerid,season = "ALL")$get_data_frames()[[1]]
+    output_data$gamelogsRecent = output_data$gamelogs%>% head(20)
+    
+    output_data$gamelogsSpecfic  = nba$playergamelog$PlayerGameLog(player_id = playerid, season = season)$get_data_frames()[[1]] %>% filter(grepl(input$team_choice,MATCHUP))
+    
+    opp_name = teams_list %>% filter(abbreviation ==input$team_choice) %>% pull(full_name)
+    opp_name = unlist(strsplit(opp_name," ")) %>% tail(1)
     
     output$DashboardOpponent = renderDT({
-      table = dashboard_by_opp[[4]] %>% select(GROUP_VALUE,GP,MIN,PTS,REB,AST,TOV,STL,BLK,FGM:FG3_PCT) %>% mutate(id_match = ifelse(grepl(opp_name,GROUP_VALUE),1,0)) %>%
+      table = output_data$dashboard_by_opp[[4]] %>% select(GROUP_VALUE,GP,MIN,PTS,REB,AST,TOV,STL,BLK,FGM:FG3_PCT) %>% mutate(id_match = ifelse(grepl(opp_name,GROUP_VALUE),1,0)) %>%
       formattable(list(PTS =  color_tile("transparent", "lightpink"), 
                        REB =  color_tile("transparent", "lightpink"), 
                        AST =  color_tile("transparent", "lightpink"), 
@@ -126,6 +156,47 @@ Page_PlayerVsTeam_server = function(input,output, session){
     
     
   })
+    
+  })
+  
+  output$gamelogRecent = renderDT({
+    req(output_data$gamelogsRecent)
+    output_data$gamelogsRecent %>% select(GAME_DATE:MIN,PTS,REB,AST:BLK,FGM:FG3_PCT) %>%
+      formattable(list(PTS =  color_tile("transparent", "lightpink"), 
+                       REB =  color_tile("transparent", "lightpink"), 
+                       AST =  color_tile("transparent", "lightpink"), 
+                       FG_PCT = color_bar("lightblue"),
+                       FG3_PCT = color_bar("lightblue")
+                       
+      )) %>%
+        as.datatable(options = list(scrollX=T, pageLength = nrow(.), lengthMenu = c(), dom = "t"), fillContainer = FALSE, selection = 'single',class = 'cell-border stripe') 
+    
+  })
+  
+  observe({
+    req(output_data$gamelogsRecent)
+    gamelogsRecent_id = output_data$gamelogsRecent$Game_ID[input$gamelogRecent_rows_selected] 
+    callModule(module = module_gameBoxScore_server, id = "gamelogsRecent", gameid = gamelogsRecent_id)
+  })
+  
+  output$gamelogsSpecfic = renderDT({
+    req(output_data$gamelogsSpecfic)
+    output_data$gamelogsSpecfic %>% select(GAME_DATE:MIN,PTS,REB,AST:BLK,FGM:FG3_PCT) %>%
+      formattable(list(PTS =  color_tile("transparent", "lightpink"), 
+                       REB =  color_tile("transparent", "lightpink"), 
+                       AST =  color_tile("transparent", "lightpink"), 
+                       FG_PCT = color_bar("lightblue"),
+                       FG3_PCT = color_bar("lightblue")
+                       
+      )) %>%
+      as.datatable(options = list(scrollX=T, pageLength = nrow(.), lengthMenu = c(), dom = "t"), fillContainer = FALSE, selection = 'single',class = 'cell-border stripe') 
+    
+  })
+  
+  observe({
+    req(output_data$gamelogsSpecfic)
+    id = output_data$gamelogsSpecfic$Game_ID[input$gamelogsSpecfic_rows_selected] 
+    callModule(module = module_gameBoxScore_server, id = "gamelogsSpecfic", gameid = id)
   })
   
   
