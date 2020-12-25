@@ -68,17 +68,35 @@ Page_PlayerVsTeam_UI = function(id){
                     bsModal(id = ns("gameRecentModal"), title = "Game Details", trigger = ns("open_GameRecent_modal"), 
                             module_gameBoxScore_UI(ns("gamelogsRecent"))
                             
-                            , size = "large")
-                    ),
+                            , size = "large"),
+                    
                     bsModal(id = ns("gameSpecficModal"), title = "Game Details", trigger = ns("open_GameSpecfic_modal"), 
-                          module_gameBoxScore_UI(ns("gamelogsSpecfic"))
-                          
-                          , size = "large")
-                   ),
+                            module_gameBoxScore_UI(ns("gamelogsSpecfic"))
+                            
+                            , size = "large")
+                    
+                    
+                    ),
+                  
                     br(),
-                    br()
+                  
+                  boxPlus(
+                    width = 12,
+                    title = "Summary Statistics", 
+                    closable = TRUE, 
+                    status = "warning", 
+                    solidHeader = FALSE, 
+                    collapsible = TRUE,
+                    
+                    
+                    module_TeamDashboard_UI(ns("TeamStats"))
+                    
                     
                   )
+
+                   ), #end column 9
+                    
+                  ) #endfluidrow
                   
            
            
@@ -197,6 +215,11 @@ Page_PlayerVsTeam_server = function(input,output, session){
     req(output_data$gamelogsSpecfic)
     id = output_data$gamelogsSpecfic$Game_ID[input$gamelogsSpecfic_rows_selected] 
     callModule(module = module_gameBoxScore_server, id = "gamelogsSpecfic", gameid = id)
+  })
+  
+  observe({
+  req(input$team_choice)
+  callModule(module = module_TeamDashboard_server, id = "TeamStats", team_name = input$team_choice)
   })
   
   

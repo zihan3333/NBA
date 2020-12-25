@@ -6,8 +6,19 @@ opp_team_id = team_id_finder("LAL")
 
 playerid = player_id_finder("lebron james")
 
-,measure_type_detailed = "Usage"
-dashboard_by_opp = nba$playerdashboardbyopponent$PlayerDashboardByOpponent(player_id = playerid,season = "2019-20",per_mode_detailed = "PerGame")$get_data_frames()
+#want Defense and Opponent
+#^(Base)|(Advanced)|(Misc)|(Four Factors)|(Scoring)|(Opponent)|(Usage)|(Defense)$
+nba$leaguedashteamstats$LeagueDashTeamStats(season = "2019-20", measure_type_detailed_defense = "Opponent",player_position_abbreviation_nullable = "")$get_data_frames()
+
+# playtype"
+#USE p AND T to switch between players and Team. 
+type_grouping = "defensive"
+player_or_team = "T" #P
+nba$synergyplaytypes$SynergyPlayTypes(play_type_nullable = "Isolation", season = "2019-20",type_grouping_nullable = type_grouping, player_or_team_abbreviation = player_or_team)$get_data_frames()
+  
+nba$leaguedashpla
+
+dashboard_by_opp = nba$playerdashboardbyopponent$PlayerDashboardByOpponent(player_id = playerid,season = "2019-20",per_mode_detailed = "PerGame",measure_type_detailed = "Defense")$get_data_frames()
 dashboard_by_opp[[1]]$PTS
 
 laker_defense = nba$matchupsrollup$MatchupsRollup(season = "2019-20", per_mode_simple = "PerGame",def_team_id_nullable = opp_team_id)$get_data_frames()[[1]]
