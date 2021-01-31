@@ -14,14 +14,27 @@ nba$leaguedashteamstats$LeagueDashTeamStats(season = "2019-20", measure_type_det
 #USE p AND T to switch between players and Team. 
 type_grouping = "defensive"
 player_or_team = "T" #P
-nba$synergyplaytypes$SynergyPlayTypes(play_type_nullable = "Isolation", season = "2019-20",type_grouping_nullable = type_grouping, player_or_team_abbreviation = player_or_team)$get_data_frames()
-  
+nba$synergyplaytypes$SynergyPlayTypes(play_type_nullable = c("Isolation","Postup"), season = "2019-20",type_grouping_nullable = type_grouping, player_or_team_abbreviation = player_or_team)$get_data_frames()
+
+testframe =  nba$synergyplaytypes$SynergyPlayTypes(play_type_nullable = c("Isolation","Postup"), season = "2019-20",type_grouping_nullable = type_grouping, player_or_team_abbreviation = player_or_team)$get_data_frames()[[1]]
+
+unique(testframe$PLAY_TYPE)  
 nba$leaguedashpla
+
+playtypes = c("Cut", "Handoff","Isolation", "Misc","OffScreen","Postup","PRBallHandler","PRRollman","OffRebound","Spotup","Transition")
+
+irving_stats = lapply(playtypes, function(x){
+  nba$synergyplaytypes$SynergyPlayTypes(play_type_nullable = x, season = "2020-21", type_grouping_nullable = "offensive", player_or_team_abbreviation = "P")$get_data_frames()[[1]] %>%
+    filter(PLAYER_NAME == "Kyrie Irving")
+ 
+})
 
 dashboard_by_opp = nba$playerdashboardbyopponent$PlayerDashboardByOpponent(player_id = playerid,season = "2019-20",per_mode_detailed = "PerGame",measure_type_detailed = "Defense")$get_data_frames()
 dashboard_by_opp[[1]]$PTS
 
 laker_defense = nba$matchupsrollup$MatchupsRollup(season = "2019-20", per_mode_simple = "PerGame",def_team_id_nullable = opp_team_id)$get_data_frames()[[1]]
+
+nba$matchupsrollup$MatchupsRollup(season = "2018-19", per_mode_simple = "PerGame", off_player_id_nullable = player_id_finder("joel embiid"), def_player_id_nullable = player_id_finder("aron baynes"))$get_data_frames()[[1]]
 
 find_playerDetails = function(player_name){
   playerid = player_id_finder(player_name)
